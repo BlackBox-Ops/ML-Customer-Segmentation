@@ -48,22 +48,24 @@ ORDER BY "Age";
 -- Rata - Rata pengeluaran dan pendapatan berdasarkan kelompok usia 
 SELECT 
 	CASE
-         WHEN "Age" BETWEEN 18 AND 25 THEN '18-25'
-         WHEN "Age" BETWEEN 26 AND 35 THEN '26-35'
-         WHEN "Age" BETWEEN 36 AND 45 THEN '36-45'
-         WHEN "Age" BETWEEN 46 AND 55 THEN '46-55'
-         ELSE '56+'
-       END AS age_group,
-       ROUND(AVG("Annual Income (k$)")) AS avg_income, 
-	   ROUND(AVG("Spending Score (1-100)")) AS avg_score
+        WHEN "Age" BETWEEN 18 AND 25 THEN '18-25'
+        WHEN "Age" BETWEEN 26 AND 35 THEN '26-35'
+        WHEN "Age" BETWEEN 36 AND 45 THEN '36-45'
+        WHEN "Age" BETWEEN 46 AND 55 THEN '46-55'
+        ELSE '56+'
+    END AS age_group,
+    ROUND(AVG("Annual Income (k$)")) AS avg_income, 
+	ROUND(AVG("Spending Score (1-100)")) AS avg_score
 FROM customer_segmentation
 GROUP BY age_group;
 
 -- Analisis korelasi pendapatan dan pengeluaran
 SELECT 
-	"Annual Income (k$)",
-	"Spending Score (1-100)"
-FROM customer_segmentation;
+	"Annual Income (k$)", 
+	ROUND(AVG("Spending Score (1-100)")) AS rata_rata_spending_score
+FROM customer_segmentation
+GROUP BY "Annual Income (k$)"
+ORDER BY "Annual Income (k$)";
 
 -- Korelasi pendapatan dan pengeluaran 
 SELECT 
@@ -72,7 +74,7 @@ SELECT
         WHEN "Annual Income (k$)" BETWEEN 30001 AND 60000 THEN 'Middle Income'
         ELSE 'High Income'
     END AS income_group,
-       ROUND(AVG("Spending Score (1-100)")) AS avg_score
+        ROUND(AVG("Spending Score (1-100)")) AS avg_score
 FROM customer_segmentation
 GROUP BY income_group;
 
@@ -101,6 +103,26 @@ SELECT
 FROM customer_segmentation 
 GROUP BY age_group
 ORDER BY age_group;
+
+-- Analisis pelanggan dengan spending score tertinggi 
+SELECT 
+	"Gender", 
+	"Age", 
+	"Annual Income (k$)", 
+	"Spending Score (1-100)" 
+FROM customer_segmentation 
+ORDER BY "Spending Score (1-100)" DESC
+LIMIT 10;
+
+-- Analisis pelanggan dengan pendapatan tertinggi 
+SELECT 
+	"Gender", 
+	"Age",
+	"Annual Income (k$)",
+	"Spending Score (1-100)"
+FROM customer_segmentation 
+ORDER BY "Annual Income (k$)" DESC
+LIMIT 10;
 
 -- Analisis spending score berdasarkan gender 
 SELECT "Gender", ROUND(AVG("Spending Score (1-100)")) as rata_rata_spending_score
