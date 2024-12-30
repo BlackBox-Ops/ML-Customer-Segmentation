@@ -10,7 +10,7 @@ CREATE TABLE customer_segmentation (
 -- lihat isi dari table customer 
 SELECT * FROM customer_segmentation;
 
-SELECT "Gender", "Age", "Annual Income (k$)", "Spending Score (1-100)"
+SELECT "CustomerID","Gender", "Age", "Annual Income (k$)", "Spending Score (1-100)"
 	FROM public.customer_segmentation;
 
 SELECT * FROM public.customer_segmentation
@@ -48,14 +48,14 @@ ORDER BY "Age";
 -- Rata - Rata pengeluaran dan pendapatan berdasarkan kelompok usia 
 SELECT 
 	CASE
-        WHEN "Age" BETWEEN 18 AND 25 THEN '18-25'
-        WHEN "Age" BETWEEN 26 AND 35 THEN '26-35'
-        WHEN "Age" BETWEEN 36 AND 45 THEN '36-45'
-        WHEN "Age" BETWEEN 46 AND 55 THEN '46-55'
-        ELSE '56+'
-    END AS age_group,
-    ROUND(AVG("Annual Income (k$)")) AS avg_income, 
-	ROUND(AVG("Spending Score (1-100)")) AS avg_score
+         WHEN "Age" BETWEEN 18 AND 25 THEN '18-25'
+         WHEN "Age" BETWEEN 26 AND 35 THEN '26-35'
+         WHEN "Age" BETWEEN 36 AND 45 THEN '36-45'
+         WHEN "Age" BETWEEN 46 AND 55 THEN '46-55'
+         ELSE '56+'
+       END AS age_group,
+       ROUND(AVG("Annual Income (k$)")) AS avg_income, 
+	   ROUND(AVG("Spending Score (1-100)")) AS avg_score
 FROM customer_segmentation
 GROUP BY age_group;
 
@@ -74,7 +74,7 @@ SELECT
         WHEN "Annual Income (k$)" BETWEEN 30001 AND 60000 THEN 'Middle Income'
         ELSE 'High Income'
     END AS income_group,
-        ROUND(AVG("Spending Score (1-100)")) AS avg_score
+       ROUND(AVG("Spending Score (1-100)")) AS avg_score
 FROM customer_segmentation
 GROUP BY income_group;
 
@@ -157,6 +157,62 @@ CROSS JOIN
         GROUP BY age_group
     ) AS age_analysis
 ORDER BY gender_analysis.gender, age_analysis.age_group;
+
+-- membuat kolom baru dengan nama kategori usia 
+ALTER TABLE customer_segmentation ADD COLUMN kategori_usia VARCHAR(20);
+UPDATE customer_segmentation 
+SET kategori_usia = CASE
+	WHEN "Age" <= 18 THEN 'Remaja'
+	WHEN "Age" BETWEEN 19 AND 30 THEN 'Dewasa Muda'
+	WHEN "Age" BETWEEN 31 AND 60 THEN 'Dewasa'
+	ELSE 'Pensiun'
+END;
+
+SELECT * FROM customer_segmentation;
+
+-- kategorisasi usia 
+CREATE VIEW kelompok_belanja AS
+SELECT 
+	"Gender",
+	"kategori_usia",
+	COUNT("CustomerID") AS jumlah_pelanggan 
+FROM (
+	SELECT 
+		"CustomerID",
+		"Gender",
+		CASE 
+			WHEN "Age" <= 18 THEN 'Remaja'
+			WHEN "Age" BETWEEN 19 AND 30 THEN 'Dewasa Muda'
+			WHEN "Age" BETWEEN 31 AND 60 THEN 'Dewasa'
+			ELSE 'Pensiun'
+		END AS "kategori_usia"
+	FROM customer_segmentation 
+) AS categorized_data 
+GROUP BY "Gender", "kategori_usia";
+
+SELECT * FROM kelompok_belanja;
+
+-- gunakan window cte untuk analisis customer yang paling banyak melakukan pembelian berdasarkan usia 
+WITH daya_beli_customer AS (
+	SELECT 
+		"kategori_usia", 
+		SUM("Annual Income (k$)") AS total_pendapatan_tahunan,
+		SUM("Spending Score (1-100)") AS total_pengeluaran_tahunan
+	FROM customer_segmentation 
+	GROUP BY "kategori_usia"
+)
+
+-- mengurutkan hasil berdasarkan pendapatan tahunan, skor pengeluaran
+SELECT 
+	"kategori_usia",
+	"total_pendapatan_tahunan",
+	"total_pengeluaran_tahunan"
+FROM daya_beli_customer
+ORDER BY
+	"total_pendapatan_tahunan" DESC,
+	"total_pengeluaran_tahunan" DESC
+LIMIT 5;
+	
 
 
 	
