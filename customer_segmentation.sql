@@ -193,7 +193,7 @@ GROUP BY "Gender", "kategori_usia";
 SELECT * FROM kelompok_belanja;
 
 -- gunakan window cte untuk analisis customer yang paling banyak melakukan pembelian berdasarkan usia 
-WITH daya_beli_customer AS (
+CREATE VIEW daya_beli_customer AS  WITH daya_beli_customer AS (
 	SELECT 
 		"kategori_usia", 
 		SUM("Annual Income (k$)") AS total_pendapatan_tahunan,
@@ -214,64 +214,7 @@ ORDER BY
 LIMIT 5;
 
 SELECT * FROM daya_beli_customer;
-
--- membuat trigger untuk mengurutkan kategori usia
-
-CREATE OR REPLACE FUNCTION categorize_age_trigger()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW."Age" <= 18 THEN
-        NEW.kategori_usia := 'Remaja';
-    ELSIF NEW."Age" BETWEEN 19 AND 30 THEN
-        NEW.kategori_usia := 'Dewasa Muda';
-    ELSIF NEW."Age" BETWEEN 31 AND 60 THEN
-        NEW.kategori_usia := 'Dewasa';
-    ELSE
-        NEW.kategori_usia := 'Pensiun';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- memuat triger untuk mengisi kategori usia
-CREATE TRIGGER set_kategori_usia
-BEFORE INSERT OR UPDATE ON customer_segmentation
-FOR EACH ROW
-EXECUTE FUNCTION categorize_age_trigger();
-
--- memuat view untuk persentase jenis kelamin 
-CREATE OR REPLACE VIEW gender_percentage_by_age_group AS
-SELECT 
-    kategori_usia,
-    "Gender",
-	CONCAT(ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY kategori_usia), 2), '%') AS persentase
-FROM customer_segmentation
-GROUP BY kategori_usia, "Gender";
-
--- membuat trigger function untuk menyimpan persentase 
-CREATE OR REPLACE FUNCTION update_gender_percentage_trigger()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO gender_percentage (kategori_usia, gender, persentase)
-    SELECT 
-        kategori_usia,
-        "Gender",
-        CONCAT(ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY kategori_usia), 2), '%') AS persentase
-    FROM customer_data
-    GROUP BY kategori_usia, "Gender"
-    ON CONFLICT (kategori_usia, gender) DO UPDATE
-    SET persentase = EXCLUDED.persentase;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-SELECT * FROM gender_percentage_by_age_group;
-
-
-
-
-
-
+	
 
 
 	
