@@ -1,0 +1,8 @@
+# Pastikan file SQL terhitung dalam statistik bahasa
+*.sql linguist-language=SQL
+
+# Tambahkan konfigurasi untuk file Python (opsional)
+*.py linguist-language=Python
+
+# Jangan hitung file tertentu jika tidak relevan
+*.log linguist-vendored
