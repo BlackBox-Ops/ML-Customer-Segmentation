@@ -14,50 +14,55 @@ $$
 
  1. **Kategori usia**
     - kategori usia diberi sekor sebagai berikut : 
-    $$ 
-    k = \left\{
-    \begin{array}{ll}
-    1 & \text{Remaja} (\leq 18 \text{ Tahun}) \\
-    0.8 & \text{Dewasa Muda} (19-30 \text{ Tahun}) \\
-    0.6 & \text{Dewasa} (31-60 \text{ Tahun}) \\
-    0.4 & \text{Pensiun} (>60 \text{ Tahun})
-    \end{array}
-    \right.
-    $$
+
+$$ 
+k = \left\{
+\begin{array}{ll}
+1 & \text{Remaja} (\leq 18 \text{ Tahun}) \\
+0.8 & \text{Dewasa Muda} (19-30 \text{ Tahun}) \\
+0.6 & \text{Dewasa} (31-60 \text{ Tahun}) \\
+0.4 & \text{Pensiun} (>60 \text{ Tahun})
+\end{array}
+\right.
+$$
  
   - **Alasan** : Remaja diberi priritas tinggi karena lebih terpengaruh oleh diskon, sedangkan kelompok pensiun lebih rendah karena daya beli stabil.
  
  2. **Usia *(U)***
     - Tahap selanjutnya adalah normalisasi umur ke rentang [0,1] :
-    $$
-    U = \frac{\text{Usia}}{\text{Usia Maksimum}}
-    $$
+
+$$
+U = \frac{\text{Usia}}{\text{Usia Maksimum}}
+$$
 
  3. **Gender *(G)***
     - Gender dapat memperngaruhi respons terhadap diskon. Contoh : 
-    $$
-    G = \left\{
-    \begin{array}{ll}
-    1 & \text{Perempuan (lebih responsif terhadap diskon)} \\
-    0.8 & \text{Laki-Laki}
-    \end{array}
-    \right.
-    $$
+
+$$
+G = \left\{
+\begin{array}{ll}
+1 & \text{Perempuan (lebih responsif terhadap diskon)} \\
+0.8 & \text{Laki-Laki}
+\end{array}
+\right.
+$$
  
  4. **Pendapatan Tahunan *(I)***
     - Semakin tinggi pendapatan semakin kecil prioritas diskon :
-    $$
-    I = \frac{\text{Pendapatan Tahunan}}{\text{Pendapatan Maksimum}}
-    $$
+
+$$
+I = \frac{\text{Pendapatan Tahunan}}{\text{Pendapatan Maksimum}}
+$$
  
  5. **Skor Pengeluaran *(S)***
     - Semakin tinggi skor pengeluaran, semakin rendah prioritas diskon : 
-    $$
-    S = \frac{\text{Skor Pengeluaran}}{\text{100}}
-    $$
+    
+$$
+S = \frac{\text{Skor Pengeluaran}}{\text{100}}
+$$
  
  6. **Bobot *(W)***
-    - Bobot diberikan sesuai dnegan kepentingan. Contoh : 
+- Bobot diberikan sesuai dnegan kepentingan. Contoh : 
     - W1 = 0.3 (Kategori Usia)
     - W2 = 0.2 (Usia)
     - W3 = 0.1 (Gender)
@@ -67,13 +72,13 @@ $$
  7. **Rumus Diskon**
     - Setelah menghitung nilai prioritas *(P)*, besar diskon *(D)* dapat ditentukan dengan rumus :
 
-    $$
-    D = D_{\text{max}} \cdot P
-    $$
+$$
+D = D_{\text{max}} \cdot P
+$$
 
-    **penjelasan :**
-    - D max = Diskon maksimum yang tersedia untuk produk (misalnya 50%)
-    - P = Nilai prioritas yang dihitung dari rumus di atas, dengan nilai maksimum 1.
+**penjelasan :**
+- D max = Diskon maksimum yang tersedia untuk produk (misalnya 50%)
+- P = Nilai prioritas yang dihitung dari rumus di atas, dengan nilai maksimum.
 
 
 ## Contoh kasus :
@@ -87,37 +92,43 @@ Misalkan data pelanggan sebagai berikut :
 
 **perhitungan :**
  1 Kategori Usia :
+
  $$
-    K= 0.8
+K= 0.8
  $$
 
  2. Usia (U) :
-  $$
-    U = \frac{\text{25}}{\text{60}} = 0.42
-  $$
+
+$$
+U = \frac{\text{25}}{\text{60}} = 0.42
+$$
 
  3.  Gender (G) :
- $$
-    G = 1 (Female)
- $$
+
+$$
+G = 1 (Female)
+$$
 
  4. Pendapatan :
- $$
-    I = \frac{\text{50,000}}{\text{100,00}} = 0.5
- $$
+ 
+$$
+I = \frac{\text{50,000}}{\text{100,00}} = 0.5
+$$
 
  5. Nilai Prioritas (P) :
+
  $$
-   P = (0.3 \cdot 0.8) + (0.2 \cdot 0.42) + (0.1 \cdot 1) + (0.2 \cdot (1 - 0.5)) + (0.2 \cdot (1 - 0.6))
+P = (0.3 \cdot 0.8) + (0.2 \cdot 0.42) + (0.1 \cdot 1) + (0.2 \cdot (1 - 0.5)) + (0.2 \cdot (1 - 0.6))
  $$
 
  $$
-    P =0.24 + 0.084 + 0.1 + 0.1 + 0.08 = 0.604
+P =0.24 + 0.084 + 0.1 + 0.1 + 0.08 = 0.604
  $$
 
- 6. Nilai Prioritas (P)
+ 6. Nilai Prioritas (P) :
+
  $$
-    D = 50 \cdot  0.604 = 30.2 \%
+ D = 50 \cdot  0.604 = 30.2 \%
  $$
 
  7. Jika ingin menghitung dengan SQL
