@@ -16,14 +16,14 @@ $$
     - kategori usia diberi sekor sebagai berikut : 
 
 $$ 
-k = \left\{
-\begin{array}{ll}
-1 & \text{Remaja} (\leq 18 \text{ Tahun}) \\
-0.8 & \text{Dewasa Muda} (19-30 \text{ Tahun}) \\
-0.6 & \text{Dewasa} (31-60 \text{ Tahun}) \\
-0.4 & \text{Pensiun} (>60 \text{ Tahun})
-\end{array}
-\right.
+    k = \left\{
+    \begin{array}{ll}
+    1 & \text{Remaja} (\leq 18 \text{ Tahun}) \\
+    0.8 & \text{Dewasa Muda} (19-30 \text{ Tahun}) \\
+    0.6 & \text{Dewasa} (31-60 \text{ Tahun}) \\
+    0.4 & \text{Pensiun} (>60 \text{ Tahun})
+    \end{array}
+    \right.
 $$
  
   - **Alasan** : Remaja diberi priritas tinggi karena lebih terpengaruh oleh diskon, sedangkan kelompok pensiun lebih rendah karena daya beli stabil.
