@@ -267,7 +267,131 @@ $$ LANGUAGE plpgsql;
 
 SELECT * FROM gender_percentage_by_age_group;
 
+-- analisis persentase konsumen loyal berdasarkan gender dan kategori usia 
+SELECT 
+    "CustomerID",
+    "Gender",
+    "Age",
+    CASE 
+        WHEN "Age" <= 18 THEN 'Remaja'
+        WHEN "Age" BETWEEN 19 AND 30 THEN 'Dewasa Muda'
+        WHEN "Age" BETWEEN 31 AND 60 THEN 'Dewasa'
+        ELSE 'Pensiun'
+    END AS "Kategori Usia"
+FROM customer_segmentation;
 
+WITH Frekuensi AS (
+    SELECT 
+        "CustomerID", 
+        "Gender", 
+        "kategori_usia", 
+        COUNT(*) AS "Frekuensi Interaksi"
+    FROM customer_segmentation
+    GROUP BY "CustomerID", "Gender", "kategori_usia"
+)
+SELECT AVG("Frekuensi Interaksi") AS rata_rata_frekuensi
+FROM Frekuensi;
+
+SELECT * FROM customer_segmentation;
+
+SELECT * FROM kelompok_belanja;
+
+CREATE VIEW Resiko AS (
+	SELECT 
+		"CustomerID",
+		"Gender",
+		"Age",
+		"Annual Income (k$)", 
+		"Spending Score (1-100)", 
+		"kategori_usia",
+		ROUND((0.4 * ("Age" / (SELECT MAX("Age") FROM customer_segmentation)) + 
+           0.3 * (1 - ("Annual Income (k$)" / (SELECT MAX("Annual Income (k$)") FROM customer_segmentation))) +
+           0.3 * (1 - ("Spending Score (1-100)" / 100))), 2) AS total_risiko
+	FROM customer_segmentation
+);
+
+-- Query untuk melihat total resiko per kategori 
+SELECT * FROM Resiko;
+
+-- menentukan diskon terbaik 
+CREATE VIEW diskon AS (
+SELECT 
+    "CustomerID",
+	"Gender",
+	"Age",
+	"Annual Income (k$)", 
+	"Spending Score (1-100)", 
+	"kategori_usia",
+    ROUND(
+        (0.3 * 
+            CASE 
+                WHEN "kategori_usia" = 'Remaja' THEN 1 
+                WHEN "kategori_usia" = 'Dewasa Muda' THEN 0.8 
+                WHEN "kategori_usia" = 'Dewasa' THEN 0.6 
+                ELSE 0.4 
+            END
+        ) + 
+        (0.2 * ("Age" / (SELECT MAX("Age") FROM customer_segmentation))) + 
+        (0.1 * 
+            CASE 
+                WHEN "Gender" = 'Female' THEN 1 
+                ELSE 0.8 
+            END
+        ) + 
+        (0.2 * (1 - ("Annual Income (k$)" / (SELECT MAX("Annual Income (k$)") FROM customer_segmentation)))) + 
+        (0.2 * (1 - ("Spending Score (1-100)" / 100))), 4
+    ) AS prioritas_diskon,
+    ROUND(50 * (
+        (0.3 * 
+            CASE 
+                WHEN "kategori_usia" = 'Remaja' THEN 1 
+                WHEN "kategori_usia" = 'Dewasa Muda' THEN 0.8 
+                WHEN "kategori_usia" = 'Dewasa' THEN 0.6 
+                ELSE 0.4 
+            END
+        ) + 
+        (0.2 * ("Age" / (SELECT MAX("Age") FROM customer_segmentation))) + 
+        (0.1 * 
+            CASE 
+                WHEN "Gender" = 'Female' THEN 1 
+                ELSE 0.8 
+            END
+        ) + 
+        (0.2 * (1 - ("Annual Income (k$)" / (SELECT MAX("Annual Income (k$)") FROM customer_segmentation)))) + 
+        (0.2 * (1 - ("Spending Score (1-100)" / 100)))
+    ), 2) AS diskon
+FROM customer_segmentation
+);
+
+SELECT * FROM diskon;
+
+-- buat query untuk perhitungan segmentasi diskon pelanggan 
+-- Membuat Segmentasi Diskon Pelanggan
+CREATE VIEW segmentasi_diskon AS (
+SELECT 
+    "CustomerID",
+	"Gender",
+	"Age",
+	"Annual Income (k$)", 
+	"Spending Score (1-100)", 
+	"kategori_usia",
+    -- Klasifikasi Pendapatan
+    CASE 
+        WHEN "Annual Income (k$)" <= 20000 THEN 'Low Income'
+        WHEN "Annual Income (k$)" BETWEEN 20001 AND 60000 THEN 'Middle Income'
+        ELSE 'High Income'
+    END AS income_group,
+    -- Penentuan Tingkat Diskon
+    CASE 
+        WHEN "Spending Score (1-100)"< 30 THEN 'High Discount (30%)'
+        WHEN "Spending Score (1-100)" BETWEEN 30 AND 70 THEN 'Medium Discount (20%)'
+        ELSE 'Low Discount (10%)'
+    END AS discount_level
+FROM customer_segmentation 
+ORDER BY "kategori_usia", "income_group", "discount_level"
+);
+
+SELECT * FROM segmentasi_diskon;
 
 
 
