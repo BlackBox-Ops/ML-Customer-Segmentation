@@ -36,3 +36,6 @@ df.drop('Gender', axis=1)
 df = pd.DataFrame(scaler.fit_transform(df), columns= df.columns)
 df['Gender'] = Gender
 print(df.head())
+
+# simpan file hasil transformasi ke dalam bentuk format csv 
+df.to_csv('../data/hasil_transformasi.csv', index=False)
