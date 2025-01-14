@@ -16,5 +16,24 @@ df = pd.read_csv('../data/hasil_transformasi.csv')
 X = df.iloc[:, :4]  # memilih semua kolom pada datasheet yang sudah di transformasi 
 X = np.array(X)     # transformasi kolom X ke dalam bentuk array 
 
-# buat model fuzzy c-means 
-model_c_means = FCM(n_clusters=5)
+# buat model fuzzy c-means dan atur jumlah nila k sebesar 4, parameter fuzzy 2.0, jumlah iterasi 150 
+model_c_means = FCM(n_clusters=4, m=2.0, max_iter=150, error=1e-5, random_state=42)
+
+# masukan variabel X dan uji dengan variabel model c-means
+model_c_means.fit(X)
+
+#  tentukan titik tengah dari masing-masing cluster 
+centers = model_c_means.centers
+
+# buat label cluster dan prediksi terhadap nilai X
+labels  = model_c_means.predict(X)
+
+# load datasheet untuk digabungan dengan hasil k-means 
+data = pd.read_csv('../data/kmeans.csv')
+
+# simpan hasil klaster ke c-means 
+data['C-means'] = labels
+print(df)
+
+# simpan file hasil transformasi ke dalam bentuk format csv 
+data.to_csv('../data/cmeans.csv', index=False)
