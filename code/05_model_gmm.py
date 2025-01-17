@@ -46,7 +46,6 @@ gmm = GaussianMixture(n_components=4, random_state=42)
 gmm.fit_predict(df_customer_scaled)
 gmm_labels = gmm.predict(df_customer_scaled)
 
-
 # load datasheet untuk digabungan dengan hasil k-means 
 data = pd.read_csv('../data/kmeans.csv')
 
@@ -57,4 +56,8 @@ print(data)
 # simpan file hasil transformasi ke dalam bentuk format csv 
 data.to_csv('../data/GMM.csv', index=False)
 
+# Simpan model dan scaler
+joblib.dump(label_encoder, '../models/gmm model/label_encoder.pkl')
+joblib.dump(scaler, '../models/gmm model/standard_scaler.pkl')
+joblib.dump(gmm, '../models/gmm model/gmm_model.pkl')
 
