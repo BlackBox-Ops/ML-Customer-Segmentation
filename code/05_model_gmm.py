@@ -8,7 +8,7 @@ from scipy.stats.mstats import winsorize # Library untuk handling outlier
 from sklearn.preprocessing import LabelEncoder, StandardScaler # Library untuk preprocessing data numerik dan kategorik
 
 from sklearn.mixture import GaussianMixture  # Library untuk load model GMM 
-from sklearn.metrics import silhouette_samples, davies_bouldin_score # Library untuk pengukuran model
+from sklearn.metrics import silhouette_score, davies_bouldin_score # Library untuk pengukuran model
 
 # Buat variabel untuk handling error pada saat proses komputasi
 warnings.filterwarnings('ignore')
@@ -45,6 +45,13 @@ df_customer_scaled['Gender'] = Gender
 gmm = GaussianMixture(n_components=4, random_state=42)
 gmm.fit_predict(df_customer_scaled)
 gmm_labels = gmm.predict(df_customer_scaled)
+
+sil_score = silhouette_score(df_customer_scaled, gmm_labels)
+print(f'silhouette score : {sil_score:.3f}')
+
+# Hitung Davies-Boundin Index
+db_index = davies_bouldin_score(df_customer_scaled, gmm_labels)
+print(f'Davies-Boundin Index : {db_index:.3f}')
 
 # load datasheet untuk digabungan dengan hasil k-means 
 data = pd.read_csv('../data/kmeans.csv')
