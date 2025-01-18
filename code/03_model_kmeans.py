@@ -2,6 +2,7 @@
 import numpy as np   # import library untuk komputasi numerik dengan numpy 
 import pandas as pd  # import library untuk pengolahan dataframe dengan pandas 
 import warnings      # import library untuk penanganan error 
+import joblib        # import library untuk load model ke dlaam format joblib 
 
 from sklearn.cluster import KMeans  # import library untuk pembuatan model k-means 
 
@@ -32,3 +33,6 @@ print(data.head())
 
 # simpan file hasil transformasi ke dalam bentuk format csv 
 data.to_csv('../data/kmeans.csv', index=False)
+
+# Simpan model 
+joblib.dump(k_means, '../models/kmeans model/kmeans_model.pkl')

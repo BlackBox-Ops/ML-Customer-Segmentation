@@ -2,6 +2,7 @@
 import pandas as pd     # library untuk pengolahan dataframe 
 import warnings         # library untuk handling error 
 import numpy  as np     # library untuk proses komputasi numerik 
+import joblib           # library untuk load model yang sudah jadi kedalam format joblib
 
 # library untuk model fuzzy c-means 
 from fcmeans import FCM
@@ -37,3 +38,6 @@ print(df)
 
 # simpan file hasil transformasi ke dalam bentuk format csv 
 data.to_csv('../data/cmeans.csv', index=False)
+
+# Simpan model dan scaler
+joblib.dump(model_c_means, '../models/cmeans model/cmeans_model.pkl')
