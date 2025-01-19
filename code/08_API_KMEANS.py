@@ -7,8 +7,8 @@ import uvicorn
 
 # Inisialisasi aplikasi FastAPI
 app = FastAPI(
-    title="API Customer Segmentation dengan GMM",
-    description="API untuk segmentasi pelanggan menggunakan Gaussian Mixture Model (GMM)",
+    title="API Customer Segmentation dengan K MEANS",
+    description="API untuk segmentasi pelanggan menggunakan K MEANS",
     version="1.0"
 )
 
@@ -16,7 +16,7 @@ app = FastAPI(
 try:
     label_encoder_path = "../models/preprocessing/label_encoder.pkl"
     scaler_path = "../models/preprocessing/standard_scaler.pkl"
-    gmm_model_path = "../models/gmm model/gmm_model.pkl"
+    gmm_model_path = "../models/kmeans model/kmeans_model.pkl"
 
     label_encoder = load(label_encoder_path)
     scaler = load(scaler_path)
@@ -68,4 +68,4 @@ async def predict(data: InputData):
 
 #Menjalankan aplikasi FastAPI dengan Uvicorn
 if __name__ == "__main__":
-    uvicorn.run("06_API_GMM:app", host="127.0.0.1", port=8000, log_level="info")
+    uvicorn.run("08_API_KMEANS:app", host="127.0.0.1", port=8000, log_level="info")
