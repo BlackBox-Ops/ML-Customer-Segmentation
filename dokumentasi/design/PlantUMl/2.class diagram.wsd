@@ -1,0 +1,77 @@
+@startuml class
+
+skinparam PackageStyle rect
+skinparam class {
+    BackgroundColor lightyellow
+    BorderColor black
+    FontColor black
+}
+
+class User {
+    - userID: String
+    - username: String
+    - password: String
+    - role: String
+    + login(): Boolean
+    + logout(): Void
+}
+
+class Admin {
+    - settingsPermissions: Boolean
+    + manageCustomerData(data: CustomerData): Void
+    + updateSettings(settings: ApplicationSettings): Void
+}
+
+class Analyst {
+    - reportAccessLevel: String
+    + generateReports(criteria: String): Report
+    + visualizeSegmentation(data: SegmentationData): Visualization
+}
+
+class EndUser {
+    - accessLevel: String
+    + viewSegmentation(segmentID: String): Visualization
+}
+
+class CustomerData {
+    - customerID: String
+    - name: String
+    - demographicInfo: String
+    - purchaseHistory: List<Purchase>
+    + updateData(customerID: String, data: CustomerData): Void
+    + deleteData(customerID: String): Void
+}
+
+class DataManagement {
+    - exportFormat: String
+    + exportData(format: String): File
+    + validateData(data: CustomerData): Boolean
+}
+
+class CustomerSegmentation {
+    - segmentID: String
+    - segmentName: String
+    - segmentCriteria: String
+    + predictSegment(data: CustomerData): Segment
+    + assignSegment(customerID: String, segmentID: String): Void
+}
+
+class ApplicationSettings {
+    - theme: String
+    - language: String
+    - dataRetentionPolicy: String
+    + updateSetting(settingName: String, value: String): Void
+}
+
+User <|-- Admin
+User <|-- Analyst
+User <|-- EndUser
+
+Admin "1" --> "1..*" CustomerData
+Analyst "1" --> "1..*" CustomerData
+CustomerData "1" --> "1" CustomerSegmentation
+CustomerSegmentation "1..*" --> "1" DataManagement
+DataManagement "1..*" --> "1" ApplicationSettings
+Analyst "1" --> "1" DataManagement
+EndUser "1" --> "1" CustomerSegmentation
+@enduml
