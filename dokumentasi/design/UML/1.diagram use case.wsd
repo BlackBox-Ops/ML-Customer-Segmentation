@@ -1,0 +1,53 @@
+@startuml usecase
+left to right direction
+skinparam PackageStyle rect
+skinparam usecase {
+    BackgroundColor lightyellow
+    BorderColor black
+    FontColor black
+}
+
+rectangle "Customer Segmentation System" {
+    ' Creating Actors
+    actor Admin
+    actor Analyst
+    actor EndUser as "End User"
+
+    ' Use Case Definitions
+    usecase "Manage and Update\nApplication Settings" as MUAS
+    usecase "Manage Customer Data" as MCD
+    usecase "Data Management" as DM
+    usecase "Export Data" as ED
+    usecase "Customer Segmentation" as CS
+    usecase "Generate Reports" as GR
+    usecase "Predict Customer Segment" as PDS
+    usecase "Visualize Customer\nSegmentation" as VCS
+    usecase "Login" as LN
+
+    ' Connections for Admin
+    Admin -- MUAS
+    Admin -left- MCD
+
+    ' Connections for Analyst
+    Analyst -- DM
+    Analyst -down- CS
+
+    ' Connections for End User
+    EndUser -right- CS
+
+    ' Include Relationships
+    MUAS .down.> LN : <<include>>
+    MCD .right.> LN : <<include>>
+    DM .down.> LN : <<include>>
+    CS .down.> LN : <<include>>
+
+    ' Generalization Relationships
+    MCD --> DM
+    ED -left-> DM
+
+    ' Extend Relationships
+    GR .down.> CS : <<include>>
+    PDS .left.|> CS : <<extend>>
+    VCS ..|> CS : <<extend>>
+}
+@enduml
