@@ -15,25 +15,38 @@ participant "Koneksi Database" as db
 
 ' Login process starts
 analyst -> main : Login(userID, username, password, role)
-main -> validasi : ValidateCredentials(userID, username, password, role)
-alt Valid credentials
-    validasi -> db : ExecuteQuery("SELECT * FROM users WHERE userID = ? AND username = ? AND password = ? AND role = 'analyst'")
-    db --> validasi : Return Success
-    validasi --> main : Valid
-    main -> analyst : Access Granted
-else Invalid credentials
-    validasi --> main : Invalid
-    main -> analyst : Access Denied
-end
+activate main
+    main -> validasi : ValidateCredentials(userID, username, password, role)
+    activate validasi
+        alt Valid credentials
+            validasi -> db : ExecuteQuery("SELECT * FROM users WHERE userID = ? AND username = ? AND password = ? AND role = 'analyst'")
+            activate db
+                db --> validasi : Return Success
+            deactivate db
+            validasi --> main : Valid
+        deactivate validasi
+        main -> analyst : Access Granted
+    else Invalid credentials
+        validasi --> main : Invalid
+        deactivate validasi
+        main -> analyst : Access Denied
+    end
+deactivate main
 
 ' Highlighted Logout process
-group Logout Process 
+group Logout Process
     analyst -> main : Logout()
-    main -> validasi : Destroy session
-    validasi -> db : Update session state
-    db --> validasi : Acknowledged
-    validasi -> main : Session destroyed
-    main -> analyst : Logout Successful
+    activate main
+        main -> validasi : Destroy session
+        activate validasi
+            validasi -> db : Update session state
+            activate db
+                db --> validasi : Acknowledged
+            deactivate db
+            validasi -> main : Session destroyed
+        deactivate validasi
+        main -> analyst : Logout Successful
+    deactivate main
 end
 
 ' Destroy objects
