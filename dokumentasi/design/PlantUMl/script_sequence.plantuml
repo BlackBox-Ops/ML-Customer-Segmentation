@@ -1,0 +1,49 @@
+@startuml Administrator
+
+actor Administrator
+
+participant "API Untuk Melakukan Sing in" as API       /' Mendefinisikan objek API '/
+control "auth/v1/sigin" as Microservice                /' Mendefinisikan kontrol untuk Microservice '/
+control "SDK Cognito" as AWSCognito                    /' Mendefinisikan kontrol untuk AWS Cognito '/
+
+Administrator -> Microservice : 1. Request POST        
+
+loop Get & Validate Access Token 
+    /' Box untuk kelompok komponen Microservice '/
+    box "Profitto Microservice" #LightBlue
+        control "Microservice Provitto" as Microservice
+    end box
+
+    /' Box untuk kelompok komponen AWS Cognito '/
+    box "AWS Cognito" #Orange
+        control "AWS Cognito" as AWSCognito
+    end box
+    
+    /' Mengaktifkan Microservice untuk memproses permintaan '/
+    activate Microservice
+        /' Microservice memanggil perintah untuk menginisiasi autentikasi '/
+        Microservice -> AWSCognito : 2. Call InitiateAuthCommand 
+    deactivate /' Menonaktifkan Microservice setelah panggilan '/
+    
+    /' Mengaktifkan AWS Cognito untuk memproses permintaan '/
+    activate AWSCognito
+        /' AWS Cognito mengembalikan respons autentikasi '/
+        AWSCognito --> Microservice : 3. Response initiateAuthCommand
+    deactivate /' Menonaktifkan AWS Cognito setelah respons dikirim '/
+
+    /' Mengaktifkan Microservice lagi untuk memproses respons '/
+    activate Microservice
+        /' Memeriksa apakah token tidak valid atau sudah kedaluwarsa '/
+        break if token is not valid or Expired 
+            /' Mengembalikan kesalahan jika token tidak valid '/
+            Microservice -> Administrator : 4. HTTP 400, status Code : AUT-003-000 (General Error)
+        end
+        /' Jika token valid '/
+        alt if Token is valid
+            /'  Menonaktifkan Microservice setelah proses selesai '/
+            Microservice -> Administrator : 5.HTTP 200, Status Code : AUT-003-204 (Successfully sign in)
+    deactivate Microservice
+end
+end loop
+
+@enduml

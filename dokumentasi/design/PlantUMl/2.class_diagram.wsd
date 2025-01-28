@@ -1,12 +1,4 @@
 @startuml class
-
-skinparam PackageStyle rect
-skinparam class {
-    BackgroundColor lightyellow
-    BorderColor black
-    FontColor black
-}
-
 class User {
     - userID: String
     - username: String
@@ -14,23 +6,27 @@ class User {
     - role: String
     + login(): Boolean
     + logout(): Void
+    + executeQuery(query: String): ResultSet
 }
 
 class Admin {
     - settingsPermissions: Boolean
     + manageCustomerData(data: CustomerData): Void
     + updateSettings(settings: ApplicationSettings): Void
+    + executeQuery(query: String): ResultSet
 }
 
 class Analyst {
     - reportAccessLevel: String
     + generateReports(criteria: String): Report
     + visualizeSegmentation(data: SegmentationData): Visualization
+    + executeQuery(query: String): ResultSet
 }
 
 class EndUser {
     - accessLevel: String
     + viewSegmentation(segmentID: String): Visualization
+    + executeQuery(query: String): ResultSet
 }
 
 class CustomerData {
@@ -40,12 +36,14 @@ class CustomerData {
     - purchaseHistory: List<Purchase>
     + updateData(customerID: String, data: CustomerData): Void
     + deleteData(customerID: String): Void
+    + executeQuery(query: String): ResultSet
 }
 
 class DataManagement {
     - exportFormat: String
     + exportData(format: String): File
     + validateData(data: CustomerData): Boolean
+    + executeQuery(query: String): ResultSet
 }
 
 class CustomerSegmentation {
@@ -54,6 +52,7 @@ class CustomerSegmentation {
     - segmentCriteria: String
     + predictSegment(data: CustomerData): Segment
     + assignSegment(customerID: String, segmentID: String): Void
+    + executeQuery(query: String): ResultSet
 }
 
 class ApplicationSettings {
@@ -61,6 +60,33 @@ class ApplicationSettings {
     - language: String
     - dataRetentionPolicy: String
     + updateSetting(settingName: String, value: String): Void
+    + executeQuery(query: String): ResultSet
+}
+
+class KoneksiBasisData {
+    - connectionString: String
+    - username: String
+    - password: String
+    + connect(): Boolean
+    + disconnect(): Void
+    + executeQuery(query: String): ResultSet
+}
+
+class Validasi {
+    + validateInput(input: Object): Boolean
+    + validatePermissions(user: User): Boolean
+    + validateDataFormat(data: Object): Boolean
+}
+
+class Antarmuka {
+    + tampilkanMenu(): Void
+    + ambilInput(): String
+    + tampilkanPesan(pesan: String): Void
+    + tampilkanData(data: Object): Void
+}
+
+class Main {
+    + main(args: String[]): Void
 }
 
 User <|-- Admin
@@ -74,4 +100,15 @@ CustomerSegmentation "1..*" --> "1" DataManagement
 DataManagement "1..*" --> "1" ApplicationSettings
 Analyst "1" --> "1" DataManagement
 EndUser "1" --> "1" CustomerSegmentation
+
+User --> KoneksiBasisData : "uses"
+CustomerData --> Validasi : "validates"
+CustomerSegmentation --> Validasi : "validates"
+Main --> User : "manages"
+Main --> KoneksiBasisData : "initializes"
+Antarmuka --> User : "interacts with"
+Antarmuka --> CustomerData : "interacts with"
+Antarmuka --> CustomerSegmentation : "interacts with"
+Antarmuka --> DataManagement : "interacts with"
+Antarmuka --> ApplicationSettings : "interacts with"
 @enduml

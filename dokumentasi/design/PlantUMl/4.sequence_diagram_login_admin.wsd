@@ -1,0 +1,65 @@
+@startuml sequence
+
+' Set default object color to yellow
+skinparam sequenceParticipantBackgroundColor #FFFF99
+skinparam sequenceParticipantBorderColor Black
+
+actor Admin
+
+participant "m:Main" as main
+participant "an:Antarmuka" as antarmuka
+participant "v:Validasi" as validasi
+participant "k:KoneksiBasisData" as db
+
+' Login Process
+Admin -> main : 1. Login (username, password)
+activate main
+
+main -> antarmuka : 2. tampilkanFormLogin()
+activate antarmuka
+Admin -> antarmuka : 3. Input username dan password
+antarmuka -> validasi : 4. validateLogin(username, password)
+deactivate antarmuka
+
+activate validasi
+validasi -> db : 5. connect()
+activate db
+db -> validasi : 6. connectionSuccess
+deactivate db
+
+validasi -> db : 7. executeQuery("SELECT * FROM Admin WHERE username=? AND password=?")
+activate db
+db --> validasi : 8. resultSet(valid/invalid)
+deactivate db
+
+alt Valid Credentials
+    validasi -> main : 9. valid
+    deactivate validasi
+    main -> Admin : 10. Login Successful
+else Invalid Credentials
+    validasi -> main : 9. invalid
+    deactivate validasi
+    main -> Admin : 10. Access Denied
+end
+deactivate main
+
+' Logout Process
+Admin -> main : 11. Logout()
+activate main
+main -> validasi : 12. destroySession()
+activate validasi
+validasi -> db : 13. updateSessionState()
+activate db
+db --> validasi : 14. acknowledged
+deactivate db
+validasi -> main : 15. sessionDestroyed
+deactivate validasi
+main -> Admin : 16. Logout Successful
+deactivate main
+
+' Destroy objects
+destroy db
+destroy validasi
+destroy main
+
+@enduml

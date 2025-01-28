@@ -48,6 +48,6 @@ rectangle "Customer Segmentation System" {
     ' Extend Relationships
     GR .down.> CS : <<include>>
     PDS .left.|> CS : <<extend>>
-    VCS ..|> CS : <<extend>>
+    VCS <.. CS : <<extend>>
 }
 @enduml

@@ -1,0 +1,99 @@
+@startuml object_diagram_detailed
+
+skinparam ObjectBorderColor black
+skinparam ObjectBackgroundColor lightyellow
+skinparam ObjectFontColor black
+
+object admin1 {
+    userID = "A001"
+    username = "AdminUser"
+    role = "Admin"
+    settingsPermissions = true
+}
+
+object analyst1 {
+    userID = "AN001"
+    username = "AnalystUser"
+    role = "Analyst"
+    reportAccessLevel = "High"
+}
+
+object endUser1 {
+    userID = "EU001"
+    username = "EndUser"
+    role = "EndUser"
+    accessLevel = "ReadOnly"
+}
+
+object customerData1 {
+    customerID = "C001"
+    name = "John Doe"
+    demographicInfo = "Male, 30"
+    purchaseHistory = ["Order001", "Order002"]
+}
+
+object customerSegmentation1 {
+    segmentID = "S001"
+    segmentName = "Premium"
+    segmentCriteria = "High Spending"
+}
+
+object dataManagement1 {
+    exportFormat = "CSV"
+}
+
+object applicationSettings1 {
+    theme = "Dark Mode"
+    language = "English"
+    dataRetentionPolicy = "1 Year"
+}
+
+object koneksiBasisData1 {
+    connectionString = "jdbc:mysql://localhost:3306/db"
+    username = "root"
+    password = "password"
+}
+
+object validasi1 {
+    // No attributes as Validasi only has methods
+}
+
+object antarmuka1 {
+    // No attributes as Antarmuka only has methods
+}
+
+object main {
+    // Main does not hold state, just executes methods
+}
+
+' Relationships
+admin1 --> customerData1 : "Manages"
+admin1 --> applicationSettings1 : "Updates"
+
+analyst1 --> customerData1 : "Accesses"
+analyst1 --> customerSegmentation1 : "Analyzes"
+analyst1 --> dataManagement1 : "Exports Data"
+
+endUser1 --> customerSegmentation1 : "Views Segmentation"
+
+customerData1 --> validasi1 : "Validates"
+customerSegmentation1 --> validasi1 : "Validates"
+dataManagement1 --> validasi1 : "Validates Export"
+
+antarmuka1 --> admin1 : "Interacts with"
+antarmuka1 --> analyst1 : "Interacts with"
+antarmuka1 --> endUser1 : "Interacts with"
+antarmuka1 --> customerData1 : "Displays Data"
+antarmuka1 --> customerSegmentation1 : "Displays Segmentation"
+
+main --> antarmuka1 : "Initializes"
+main --> koneksiBasisData1 : "Establishes Connection"
+main --> admin1 : "Creates Admin"
+main --> analyst1 : "Creates Analyst"
+main --> endUser1 : "Creates EndUser"
+
+koneksiBasisData1 --> admin1 : "Executes Queries"
+koneksiBasisData1 --> analyst1 : "Executes Queries"
+koneksiBasisData1 --> endUser1 : "Executes Queries"
+
+@enduml
