@@ -1,4 +1,11 @@
 @startuml class
+
+' Set background color for all participants
+skinparam sequenceParticipantBackgroundColor LightYellow
+skinparam sequenceParticipantBorderColor Black
+skinparam SequenceGroupBackgroundColor LightYellow
+skinparam ActorBackgroundColor LightYellow
+
 actor Analyst as analyst
 
 ' Main objects
@@ -7,26 +14,26 @@ participant "Validasi" as validasi
 participant "Koneksi Database" as db
 
 ' Login process starts
-admin -> main : Login(userID, username, password, role)
+analyst -> main : Login(userID, username, password, role)
 main -> validasi : ValidateCredentials(userID, username, password, role)
 alt Valid credentials
     validasi -> db : ExecuteQuery("SELECT * FROM users WHERE userID = ? AND username = ? AND password = ? AND role = 'analyst'")
     db --> validasi : Return Success
     validasi --> main : Valid
-    main -> admin : Access Granted
+    main -> analyst : Access Granted
 else Invalid credentials
     validasi --> main : Invalid
-    main -> admin : Access Denied
+    main -> analyst : Access Denied
 end
 
 ' Highlighted Logout process
-group Logout Process (lightyellow)
-    admin -> main : Logout()
+group Logout Process 
+    analyst -> main : Logout()
     main -> validasi : Destroy session
     validasi -> db : Update session state
     db --> validasi : Acknowledged
     validasi -> main : Session destroyed
-    main -> admin : Logout Successful
+    main -> analyst : Logout Successful
 end
 
 ' Destroy objects

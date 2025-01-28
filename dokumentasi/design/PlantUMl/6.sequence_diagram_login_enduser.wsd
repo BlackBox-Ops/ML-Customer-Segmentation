@@ -1,0 +1,40 @@
+@startuml sequence diagram login enduser 
+
+' Set background color for all participants
+skinparam sequenceParticipantBackgroundColor LightYellow
+skinparam sequenceParticipantBorderColor Black
+skinparam SequenceGroupBackgroundColor LightYellow
+skinparam ActorBackgroundColor LightYellow
+
+actor EndUser as enduser
+
+participant "Main" as main 
+participant "Validasi" as validasi
+participant "koneksi database" as db 
+
+enduser -> main : Login(userID, username, password, role)
+main -> validasi : ValidateCredentials(userID, username, password, role)
+alt Valid Credentials
+    validasi -> db : ExecuteQuery("SELECT * FROM users WHERE userID = ? AND username = ? AND password = ? AND role = 'EndUser'")
+    db --> validasi :  Return Success
+    validasi --> main : valid
+    main --> enduser : Access Denied
+else Invalid Credentials
+    validasi -> main : Invalid
+    main -> enduser : Access Denied
+end
+
+group Logout Process
+    enduser -> main : Logout()
+    main -> validasi : Destroy session
+    validasi -> db : Update session state
+    db --> validasi : Acknowledged
+    validasi -> main : Session destroyed
+    main -> enduser : Logout Successful
+end
+
+destroy db 
+destroy validasi
+destroy main
+
+@enduml
